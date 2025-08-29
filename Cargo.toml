@@ -3,6 +3,14 @@ name = "grammers-grpc-server"
 version = "0.1.0"
 edition = "2024"
 
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+path = "src/main.rs"
+name = "grammers-grpc-server"
+
+
 [dependencies]
 anyhow = "1.0.99"
 dotenvy = "0.15.7"
