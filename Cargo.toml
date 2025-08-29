@@ -1,0 +1,13 @@
+[package]
+name = "grammers-grpc-server"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.0.99"
+dotenvy = "0.15.7"
+env_logger = "0.11.8"
+grammers-client = { git = "https://github.com/Lonami/grammers" }
+grammers-session = { git = "https://github.com/Lonami/grammers" }
+log = "0.4.27"
+tokio = { version = "1.47.1", features = ["macros", "rt-multi-thread", "io-util", "io-std"] }
