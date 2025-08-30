@@ -2,7 +2,9 @@ mod app_config;
 mod logger;
 mod telegram;
 
-use crate::telegram::{create_session::create_session, get_dialogs_list::get_dialogs_list};
+use log::info;
+
+use crate::telegram::{create_session::create_session, get_channels_list::get_channels_list};
 
 #[tokio::main]
 async fn main() {
@@ -12,7 +14,9 @@ async fn main() {
     let client = create_session(app_config.telegram())
         .await
         .expect("Failed to create session");
-    get_dialogs_list(&client)
+     let channels = get_channels_list(&client)
         .await
         .expect("Failed to get dialogs list");
+
+    info!("Channels total: {:?}", channels.len());
 }

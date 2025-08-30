@@ -4,6 +4,7 @@ use log::info;
 
 use crate::app_config::TelegramConfig;
 
+#[allow(dead_code)]
 pub async fn close_session(config: &TelegramConfig, client: &Client) -> Result<(), anyhow::Error> {
     info!("Closing session");
     client
@@ -15,9 +16,9 @@ pub async fn close_session(config: &TelegramConfig, client: &Client) -> Result<(
                 config.tg_session_file_path().display()
             )
         })?;
-        
+
     client.sign_out().await.context("Failed to sign out")?;
-     info!("Session closed");
-     
+    info!("Session closed");
+
     Ok(())
 }
