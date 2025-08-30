@@ -98,6 +98,7 @@ mod tests {
         };
     }
 
+    #[allow(dead_code)]
     fn teardown_env() {
         unsafe {
             remove_var(TG_ID_KEY);
