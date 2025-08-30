@@ -65,5 +65,10 @@ pub async fn create_session(config: &TelegramConfig) -> Result<Client, anyhow::E
         Err(e) => return Err(anyhow::Error::new(e)).context("Sign-in with code failed"),
     }
 
+    client
+        .session()
+        .save_to_file(session_file_path)
+        .with_context(|| format!("Failed to save session to {}", session_file_path.display()))?;
+
     Ok(client)
 }
