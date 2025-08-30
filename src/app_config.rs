@@ -7,15 +7,31 @@ pub const TG_HASH_KEY: &str = "TG_HASH";
 pub const TG_PHONE_KEY: &str = "TG_PHONE";
 pub const TG_SESSION_FILE_PATH_KEY: &str = "TG_SESSION_FILE_PATH";
 
-#[derive(Debug, Clone)]
 pub struct AppConfig {
+    telegram: TelegramConfig,
+}
+
+impl AppConfig {
+    pub fn telegram(&self) -> &TelegramConfig {
+        &self.telegram
+    }
+
+    pub fn load_config() -> Result<Self, anyhow::Error> {
+        let telegram = TelegramConfig::load_config()?;
+
+        Ok(Self { telegram })
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct TelegramConfig {
     tg_id: SecretBox<i32>,
     tg_hash: SecretString,
     tg_phone: SecretString,
     tg_session_file_path: PathBuf,
 }
 
-impl AppConfig {
+impl TelegramConfig {
     pub fn tg_id(&self) -> i32 {
         *self.tg_id.expose_secret()
     }
@@ -92,18 +108,31 @@ mod tests {
     }
 
     #[test]
-    fn test_load_config() {
+    fn test_telegram_load_config() {
         setup_env();
 
-        let config = AppConfig::load_config().expect("Failed to load config");
-
-        teardown_env();
+        let config = TelegramConfig::load_config().expect("Failed to load config");
 
         assert_eq!(config.tg_id(), TG_ID.parse::<i32>().unwrap());
         assert_eq!(config.tg_hash(), TG_HASH);
         assert_eq!(config.tg_phone(), TG_PHONE);
         assert_eq!(
             config.tg_session_file_path().to_string_lossy(),
+            TG_SESSION_FILE_PATH
+        );
+    }
+
+    #[test]
+    fn test_app_load_config() {
+        setup_env();
+
+        let config = AppConfig::load_config().expect("Failed to load config");
+        let telegram_config = config.telegram();
+        assert_eq!(telegram_config.tg_id(), TG_ID.parse::<i32>().unwrap());
+        assert_eq!(telegram_config.tg_hash(), TG_HASH);
+        assert_eq!(telegram_config.tg_phone(), TG_PHONE);
+        assert_eq!(
+            telegram_config.tg_session_file_path().to_string_lossy(),
             TG_SESSION_FILE_PATH
         );
     }
