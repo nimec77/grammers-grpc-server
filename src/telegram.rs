@@ -1,5 +1,6 @@
 use async_trait::async_trait;
 use grammers_client::types::Channel;
+use mockall::automock;
 
 use crate::{app_config::TelegramConfig, telegram::error::TelegramError};
 
@@ -9,9 +10,11 @@ pub mod error;
 
 pub mod grammers_repository;
 
+#[automock]
 #[async_trait]
 pub trait TelegramRepository {
     fn new(config: &TelegramConfig) -> Self;
+
     async fn create_session(&mut self) -> Result<(), TelegramError>;
 
     #[allow(dead_code)]

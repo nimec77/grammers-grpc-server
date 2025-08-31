@@ -3,7 +3,10 @@ use grammers_client::{Client, Config as TgConfig, InitParams, SignInError};
 use grammers_session::Session;
 use log::info;
 
-use crate::{app_config::TelegramConfig, telegram::error::TelegramError};
+use crate::{
+    app_config::TelegramConfig,
+    telegram::{domain::utils::save_session, error::TelegramError},
+};
 
 pub(crate) async fn create_session(config: &TelegramConfig) -> Result<Client, TelegramError> {
     info!("Connecting to Telegram");
@@ -63,10 +66,7 @@ pub(crate) async fn create_session(config: &TelegramConfig) -> Result<Client, Te
         Err(e) => return Err(TelegramError::from(Box::new(e))),
     }
 
-    client
-        .session()
-        .save_to_file(session_file_path)
-        .map_err(TelegramError::from)?;
+    save_session(&client, config)?;
 
     Ok(client)
 }

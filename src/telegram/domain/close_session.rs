@@ -1,7 +1,10 @@
 use grammers_client::Client;
 use log::info;
 
-use crate::{app_config::TelegramConfig, telegram::error::TelegramError};
+use crate::{
+    app_config::TelegramConfig,
+    telegram::{domain::utils::save_session, error::TelegramError},
+};
 
 #[allow(dead_code)]
 pub(crate) async fn close_session(
@@ -9,10 +12,8 @@ pub(crate) async fn close_session(
     client: &Client,
 ) -> Result<(), TelegramError> {
     info!("Closing session");
-    client
-        .session()
-        .save_to_file(config.tg_session_file_path())
-        .map_err(TelegramError::from)?;
+
+    save_session(client, config)?;
 
     client
         .sign_out()

@@ -24,6 +24,7 @@ impl TelegramRepository for GrammersRepository {
         }
     }
 
+
     async fn create_session(&mut self) -> Result<(), TelegramError> {
         let client = create_session::create_session(&self.config).await?;
         self.client = Some(client);

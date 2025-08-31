@@ -20,6 +20,7 @@ env_logger = "0.11.8"
 grammers-client = { git = "https://github.com/Lonami/grammers" }
 grammers-session = { git = "https://github.com/Lonami/grammers" }
 log = "0.4.27"
+mockall = "0.13.1"
 secrecy = { version = "0.10.3", features = ["serde"] }
 thiserror = "2.0.16"
 tokio = { version = "1.47.1", features = ["macros", "rt-multi-thread", "io-util", "io-std"] }
