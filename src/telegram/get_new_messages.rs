@@ -1,15 +1,18 @@
-use anyhow::Context;
 use grammers_client::{Client, Update, types::Chat};
 use log::{debug, info};
 
-pub async fn get_new_messages(client: &Client) -> Result<(), anyhow::Error> {
+use crate::telegram::TelegramError;
+
+
+pub async fn get_new_messages(client: &Client) -> Result<(), TelegramError> {
     info!("Getting new messages");
     let mut count = 0;
     while count < 1 {
         let update = client
             .next_update()
             .await
-            .context("Failed to get next update")?;
+            .map_err(TelegramError::from)?;
+        
         if let Update::NewMessage(message) = update {
             let chat = message.chat();
             if let Chat::Channel(channel) = chat {
