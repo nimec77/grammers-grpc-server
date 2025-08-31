@@ -5,7 +5,7 @@ use crate::{
     app_config::TelegramConfig,
     telegram::{
         TelegramRepository,
-        domain::{close_session, create_session, get_channels_list},
+        domain::{close_session, create_session, get_channels_list, get_new_messages},
         error::TelegramError,
     },
 };
@@ -31,9 +31,12 @@ impl TelegramRepository for GrammersRepository {
         Ok(())
     }
 
-    async fn close_session(&self) -> Result<(), TelegramError> {
-        if let Some(client) = &self.client {
-            close_session::close_session(&self.config, client).await
+    async fn close_session(&mut self) -> Result<(), TelegramError> {
+        if let Some(client) = &mut self.client {
+            close_session::close_session(&self.config, client).await?;
+            self.client = None;
+
+            Ok(())
         } else {
             Err(TelegramError::ClientNotFound)
         }
@@ -42,6 +45,14 @@ impl TelegramRepository for GrammersRepository {
     async fn get_channels_list(&self) -> Result<Vec<Channel>, TelegramError> {
         if let Some(client) = &self.client {
             get_channels_list::get_channels_list(client).await
+        } else {
+            Err(TelegramError::ClientNotFound)
+        }
+    }
+
+    async fn get_new_messages(&self) -> Result<(), TelegramError> {
+        if let Some(client) = &self.client {
+            get_new_messages::get_new_messages(client).await
         } else {
             Err(TelegramError::ClientNotFound)
         }

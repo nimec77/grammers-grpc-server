@@ -9,8 +9,7 @@ pub(crate) async fn create_session(config: &TelegramConfig) -> Result<Client, Te
     info!("Connecting to Telegram");
 
     let session_file_path = config.tg_session_file_path();
-    let session = Session::load_file_or_create(session_file_path)
-        .map_err(TelegramError::from)?;
+    let session = Session::load_file_or_create(session_file_path).map_err(TelegramError::from)?;
     let tg_config = TgConfig {
         session,
         api_id: config.tg_id(),

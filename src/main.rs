@@ -18,18 +18,17 @@ async fn main() -> Result<(), anyhow::Error> {
         .await
         .context("Failed to create session")?;
 
-    // let client = create_session(app_config.telegram())
-    //     .await
-    //     .expect("Failed to create session");
-    // let channels = get_channels_list(&client)
-    //     .await
-    //     .expect("Failed to get dialogs list");
+    let channels = grammers_repository
+        .get_channels_list()
+        .await
+        .context("Failed to get channels list")?;
 
-    // info!("Channels total: {:?}", channels.len());
+    info!("Channels total: {:?}", channels.len());
 
-    // get_new_messages(&client)
-    //     .await
-    //     .expect("Failed to get new messages");
+    grammers_repository
+        .get_new_messages()
+        .await
+        .context("Failed to get new messages")?;
 
     Ok(())
 }

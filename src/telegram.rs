@@ -15,8 +15,9 @@ pub trait TelegramRepository {
     async fn create_session(&mut self) -> Result<(), TelegramError>;
 
     #[allow(dead_code)]
-    async fn close_session(&self) -> Result<(), TelegramError>;
-    
+    async fn close_session(&mut self) -> Result<(), TelegramError>;
+
     async fn get_channels_list(&self) -> Result<Vec<Channel>, TelegramError>;
-    // fn get_new_messages(&self) -> Result<(), anyhow::Error>;
+
+    async fn get_new_messages(&self) -> Result<(), TelegramError>;
 }
