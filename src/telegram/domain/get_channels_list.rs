@@ -4,9 +4,9 @@ use grammers_client::{
 };
 use log::{debug, info};
 
-use crate::telegram::TelegramError;
+use crate::telegram::error::TelegramError;
 
-pub async fn get_channels_list(client: &Client) -> Result<Vec<Channel>, TelegramError> {
+pub(crate) async fn get_channels_list(client: &Client) -> Result<Vec<Channel>, TelegramError> {
     info!("Getting channels list");
     let mut dialogs = client.iter_dialogs();
 

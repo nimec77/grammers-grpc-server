@@ -1,7 +1,7 @@
 use grammers_client::{Client, Update, types::Chat};
 use log::{debug, info};
 
-use crate::telegram::TelegramError;
+use crate::telegram::error::TelegramError;
 
 pub async fn get_new_messages(client: &Client) -> Result<(), TelegramError> {
     info!("Getting new messages");
