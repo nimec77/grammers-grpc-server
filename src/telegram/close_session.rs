@@ -1,23 +1,17 @@
-use anyhow::Context;
 use grammers_client::Client;
 use log::info;
 
-use crate::app_config::TelegramConfig;
+use crate::{app_config::TelegramConfig, telegram::TelegramError};
 
 #[allow(dead_code)]
-pub async fn close_session(config: &TelegramConfig, client: &Client) -> Result<(), anyhow::Error> {
+pub async fn close_session(config: &TelegramConfig, client: &Client) -> Result<(), TelegramError> {
     info!("Closing session");
     client
         .session()
         .save_to_file(config.tg_session_file_path())
-        .with_context(|| {
-            format!(
-                "Failed to save session to {}",
-                config.tg_session_file_path().display()
-            )
-        })?;
+        .map_err(TelegramError::from)?;
 
-    client.sign_out().await.context("Failed to sign out")?;
+    client.sign_out().await.map_err(|e| TelegramError::from(Box::new(e)))?;
     info!("Session closed");
 
     Ok(())

@@ -3,7 +3,6 @@ use log::{debug, info};
 
 use crate::telegram::TelegramError;
 
-
 pub async fn get_new_messages(client: &Client) -> Result<(), TelegramError> {
     info!("Getting new messages");
     let mut count = 0;
@@ -11,8 +10,8 @@ pub async fn get_new_messages(client: &Client) -> Result<(), TelegramError> {
         let update = client
             .next_update()
             .await
-            .map_err(TelegramError::from)?;
-        
+            .map_err(|e| TelegramError::from(Box::new(e)))?;
+
         if let Update::NewMessage(message) = update {
             let chat = message.chat();
             if let Chat::Channel(channel) = chat {

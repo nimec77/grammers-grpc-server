@@ -1,17 +1,16 @@
-use anyhow::Context;
 use dialoguer::{Input, Password};
 use grammers_client::{Client, Config as TgConfig, InitParams, SignInError};
 use grammers_session::Session;
 use log::info;
 
-use crate::app_config::TelegramConfig;
+use crate::{app_config::TelegramConfig, telegram::TelegramError};
 
-pub async fn create_session(config: &TelegramConfig) -> Result<Client, anyhow::Error> {
+pub async fn create_session(config: &TelegramConfig) -> Result<Client, TelegramError> {
     info!("Connecting to Telegram");
 
     let session_file_path = config.tg_session_file_path();
     let session = Session::load_file_or_create(session_file_path)
-        .with_context(|| format!("Failed to load or create {}", session_file_path.display()))?;
+        .map_err(TelegramError::from)?;
     let tg_config = TgConfig {
         session,
         api_id: config.tg_id(),
@@ -21,12 +20,12 @@ pub async fn create_session(config: &TelegramConfig) -> Result<Client, anyhow::E
 
     let client = Client::connect(tg_config)
         .await
-        .context("Failed to connect to Telegram")?;
+        .map_err(|e| TelegramError::from(Box::new(e)))?;
 
     let is_authorized = client
         .is_authorized()
         .await
-        .context("Failed to check if authorized")?;
+        .map_err(|e| TelegramError::from(Box::new(e)))?;
     if is_authorized {
         info!("Already authorized");
         return Ok(client);
@@ -35,12 +34,12 @@ pub async fn create_session(config: &TelegramConfig) -> Result<Client, anyhow::E
     let token = client
         .request_login_code(config.tg_phone())
         .await
-        .context("Failed to request login code")?;
+        .map_err(|e| TelegramError::from(Box::new(e)))?;
 
     let code: String = Input::new()
         .with_prompt("Enter the login code you received: ")
         .interact_text()
-        .context("Failed to enter login code")?;
+        .map_err(TelegramError::from)?;
 
     let signed_in = client.sign_in(&token, &code).await;
     match signed_in {
@@ -53,22 +52,22 @@ pub async fn create_session(config: &TelegramConfig) -> Result<Client, anyhow::E
             let password = Password::new()
                 .with_prompt(format!("Enter the password for {hint}: "))
                 .interact()
-                .context("Failed to enter password")?;
+                .map_err(TelegramError::from)?;
 
             client
                 .check_password(pw_token, password.as_bytes())
                 .await
-                .context("Failed to check password")?;
+                .map_err(|e| TelegramError::from(Box::new(e)))?;
 
             info!("Signed in with password successfully");
         }
-        Err(e) => return Err(anyhow::Error::new(e)).context("Sign-in with code failed"),
+        Err(e) => return Err(TelegramError::from(Box::new(e))),
     }
 
     client
         .session()
         .save_to_file(session_file_path)
-        .with_context(|| format!("Failed to save session to {}", session_file_path.display()))?;
+        .map_err(TelegramError::from)?;
 
     Ok(client)
 }
