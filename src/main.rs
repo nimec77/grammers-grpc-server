@@ -8,7 +8,7 @@ use log::info;
 use crate::telegram::{TelegramRepository, grammers_repository::GrammersRepository};
 
 #[tokio::main]
-async fn main() -> Result<(), anyhow::Error> {
+async fn main() -> anyhow::Result<()> {
     logger::init_logger();
     let app_config = app_config::AppConfig::load_config().context("Failed to load config")?;
 
