@@ -10,6 +10,8 @@ pub mod error;
 
 pub mod grammers_repository;
 
+pub mod models;
+
 #[automock]
 #[async_trait]
 pub trait TelegramRepository {
