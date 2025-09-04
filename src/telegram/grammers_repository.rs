@@ -7,6 +7,7 @@ use crate::{
         TelegramRepository,
         domain::{close_session, create_session, get_channels_list, get_new_messages},
         error::TelegramError,
+        models::tg_messages_bus::TgMessagesBus,
     },
 };
 
@@ -23,7 +24,6 @@ impl TelegramRepository for GrammersRepository {
             client: None,
         }
     }
-
 
     async fn create_session(&mut self) -> Result<(), TelegramError> {
         let client = create_session::create_session(&self.config).await?;
@@ -51,9 +51,9 @@ impl TelegramRepository for GrammersRepository {
         }
     }
 
-    async fn get_new_messages(&self) -> Result<(), TelegramError> {
+    async fn get_new_messages(&self, tg_messages_bus: &TgMessagesBus) -> Result<(), TelegramError> {
         if let Some(client) = &self.client {
-            get_new_messages::get_new_messages(client).await
+            get_new_messages::get_new_messages(client, tg_messages_bus).await
         } else {
             Err(TelegramError::ClientNotFound)
         }

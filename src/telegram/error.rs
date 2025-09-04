@@ -1,4 +1,7 @@
 use grammers_client::{InvocationError, SignInError, client::bots::AuthorizationError};
+use tokio::sync::broadcast;
+
+use crate::telegram::models::ts_message::TgMessage;
 
 #[derive(Debug, thiserror::Error)]
 pub enum TelegramError {
@@ -23,4 +26,7 @@ pub enum TelegramError {
 
     #[error("client not found")]
     ClientNotFound,
+
+    #[error("broadcast error: {0}")]
+    BroadcastError(#[from] broadcast::error::SendError<TgMessage>),
 }
