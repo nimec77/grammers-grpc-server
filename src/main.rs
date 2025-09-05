@@ -4,8 +4,9 @@ mod telegram;
 
 use anyhow::Context;
 use log::info;
-use tokio_stream::StreamExt;
 use tokio::pin;
+use tokio_stream::StreamExt;
+use tokio_util::sync::CancellationToken;
 
 use crate::telegram::{
     TelegramRepository, grammers_repository::GrammersRepository,
@@ -33,9 +34,11 @@ async fn main() -> anyhow::Result<()> {
     let tg_messages_bus = TgMessagesBus::new();
 
     let tg_messages_bus_read = tg_messages_bus.clone();
+    let token = CancellationToken::new();
+    let child_token = token.child_token();
     tokio::spawn(async move {
         if let Err(e) = grammers_repository
-            .get_new_messages(&tg_messages_bus_read)
+            .get_new_messages(&tg_messages_bus_read, child_token)
             .await
         {
             panic!("Failed to get new messages: {:?}", e);
@@ -44,8 +47,9 @@ async fn main() -> anyhow::Result<()> {
 
     let tg_sub = tg_messages_bus.subscribe();
     pin!(tg_sub);
-    while let Some(message) = tg_sub.next().await {
+    if let Some(message) = tg_sub.next().await {
         info!("New message: {:?}", message);
+        token.cancel();
     }
 
     Ok(())

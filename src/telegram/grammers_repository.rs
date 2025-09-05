@@ -1,5 +1,6 @@
 use async_trait::async_trait;
 use grammers_client::{Client, types::Channel};
+use tokio_util::sync::CancellationToken;
 
 use crate::{
     app_config::TelegramConfig,
@@ -51,9 +52,9 @@ impl TelegramRepository for GrammersRepository {
         }
     }
 
-    async fn get_new_messages(&self, tg_messages_bus: &TgMessagesBus) -> Result<(), TelegramError> {
+    async fn get_new_messages(&self, tg_messages_bus: &TgMessagesBus, token: CancellationToken) -> Result<(), TelegramError> {
         if let Some(client) = &self.client {
-            get_new_messages::get_new_messages(client, tg_messages_bus).await
+            get_new_messages::get_new_messages(client, tg_messages_bus, token).await
         } else {
             Err(TelegramError::ClientNotFound)
         }
